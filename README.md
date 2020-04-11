@@ -30,9 +30,11 @@ stream folder structure:
 
 ```
  └─test
+    ├─title
     ├─stream.m3u8
     └─stream.ts
 
 ```
 
-try connect http://127.0.0.1:8080/stream/test/stream.m3u8
+try connect http://127.0.0.1:8080/streams/test/stream.m3u8  
+try connect http://127.0.0.1:8080/streams/get_video_list  

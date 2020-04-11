@@ -15,6 +15,19 @@ CONTENT_TYPE_MAP = {
     ".ts": "video/mp2t",
 }
 
+async def get_video_list(request):
+    folder_list = os.listdir(BASE_STREAM_DIR_PATH)
+    video_list = []
+
+    for folder_name in folder_list:
+        _temp_video = {
+            "name": folder_name
+        }
+        with open(os.path.join(BASE_STREAM_DIR_PATH, folder_name, "title"), "r") as f:
+            _temp_video["title"] = f.read().strip()
+        video_list.append(_temp_video)
+    return web.json_response(video_list)
+
 async def handle_stream(request):
     video_name = request.match_info.get("video_name", "")
     filename = request.match_info.get("filename", "")
@@ -39,4 +52,5 @@ async def handle_stream(request):
 if __name__ == '__main__':
     app = web.Application()
     app.router.add_get("/streams/{video_name}/{filename}", handle_stream)
+    app.router.add_get("/streams/get_video_list", get_video_list)
     web.run_app(app, host=HOST, port=PORT)
