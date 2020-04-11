@@ -9,9 +9,15 @@ Now only support HLS(HTTP Live Streaming)
 Create .env file
 
 ```text
-BASE_STREAM_DIR_PATH={stream file path}
+BASE_STREAM_DIR_PATH={stream folder path}
 HOST={host}
 PORT={port}
+```
+
+FFmpeg cmd: convert mp4 to m3u8 and ts
+
+```shell
+$ ffmpeg -i test.mp4 -c:v h264 -crf 21 -preset veryfast -c:a aac -b:a 128k -ac 2 -start_number 0 -hls_time 6 -hls_playlist_type event -f hls stream.m3u8
 ```
 
 ## Start
@@ -20,4 +26,13 @@ PORT={port}
 $ python server.py
 ```
 
-try connect [](http://127.0.0.1:3000)
+stream folder structure:
+
+```
+ └─test
+    ├─stream.m3u8
+    └─stream.ts
+
+```
+
+try connect http://127.0.0.1:8080/stream/test/stream.m3u8
