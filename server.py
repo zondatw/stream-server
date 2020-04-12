@@ -1,4 +1,5 @@
 import os
+import json
 import logging
 
 from aiohttp import web
@@ -13,6 +14,8 @@ PORT = os.getenv("PORT")
 CONTENT_TYPE_MAP = {
     ".m3u8": "application/vnd.apple.mpegurl",
     ".ts": "video/mp2t",
+    ".jpg": "image/jpeg",
+    ".png": "image/png",
 }
 
 async def get_video_list(request):
@@ -23,8 +26,9 @@ async def get_video_list(request):
         _temp_video = {
             "name": folder_name
         }
-        with open(os.path.join(BASE_STREAM_DIR_PATH, folder_name, "title"), "r") as f:
-            _temp_video["title"] = f.read().strip()
+        with open(os.path.join(BASE_STREAM_DIR_PATH, folder_name, "info.json"), "r") as f:
+            _data = json.load(f)
+            _temp_video.update(_data)
         video_list.append(_temp_video)
     return web.json_response(video_list)
 

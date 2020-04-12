@@ -20,6 +20,16 @@ FFmpeg cmd: convert mp4 to m3u8 and ts
 $ ffmpeg -i test.mp4 -c:v h264 -crf 21 -preset veryfast -c:a aac -b:a 128k -ac 2 -start_number 0 -hls_time 6 -hls_playlist_type event -f hls stream.m3u8
 ```
 
+Add `info.json` file to the same folder
+
+```json
+{
+    "title": "test title",
+    "description": "This is test title.",
+    "cover_file": "cover.jpg"
+}
+```
+
 ## Start
 
 ```shell
@@ -30,7 +40,8 @@ stream folder structure:
 
 ```
  └─test
-    ├─title
+    ├─info.json
+    ├─cover.jpg
     ├─stream.m3u8
     └─stream.ts
 
