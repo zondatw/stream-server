@@ -2,6 +2,7 @@ import os
 import json
 import logging
 
+import aiohttp_cors
 from aiohttp import web
 from dotenv import load_dotenv
 
@@ -16,6 +17,8 @@ CONTENT_TYPE_MAP = {
     ".ts": "video/mp2t",
     ".jpg": "image/jpeg",
     ".png": "image/png",
+    ".mp4": "application/octet-stream",
+    ".m4s": "application/octet-stream",
 }
 
 async def get_video_list(request):
@@ -53,8 +56,26 @@ async def handle_stream(request):
         body = file.read()
     return web.Response(body=body, headers=headers)
 
+async def handle_stream_m3u8(request):
+    video_name = request.match_info.get("video_name", "")
+    file_path = os.path.join(BASE_STREAM_DIR_PATH, video_name, "stream.m3u8")
+    headers = {
+        "Content-Type": CONTENT_TYPE_MAP[".m3u8"],
+    }
+    with open(file_path, "rb") as file:
+        body = file.read()
+    return web.Response(body=body, headers=headers)
+
 if __name__ == '__main__':
+    print(f"{HOST}:{PORT} -> {BASE_STREAM_DIR_PATH}")
     app = web.Application()
-    app.router.add_get("/streams/{video_name}/{filename}", handle_stream)
-    app.router.add_get("/streams/get_video_list", get_video_list)
+    cors = aiohttp_cors.setup(app)
+    cors.add(app.router.add_get("/streams/{video_name}/{filename}", handle_stream), {"*":
+            aiohttp_cors.ResourceOptions(allow_credentials=False)})
+    cors.add(app.router.add_get("/streams_m3u8/{video_name}/", handle_stream_m3u8), {"*":
+            aiohttp_cors.ResourceOptions(allow_credentials=False)})
+    cors.add(app.router.add_get("/streams_m3u8/{video_name}/{filename}", handle_stream), {"*":
+            aiohttp_cors.ResourceOptions(allow_credentials=False)})
+    cors.add(app.router.add_get("/streams/get_video_list", get_video_list), {"*":
+            aiohttp_cors.ResourceOptions(allow_credentials=False)})
     web.run_app(app, host=HOST, port=PORT)
